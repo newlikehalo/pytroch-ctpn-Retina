@@ -23,7 +23,7 @@ np.random.seed(random_seed)
 
 num_workers = 8
 epochs = 50
-lr = 1e-4
+lr = 1e-3
 resume_epoch = 0
 pre_weights = os.path.join(config.checkpoints_dir, 'ctpn_keras_weights.pth.tar')
 import ipdb
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         epoch_loss_cls = 0
         epoch_loss_regr = 0
         epoch_loss = 0
-        scheduler.step(epoch)
+        
     
         for batch_i, (imgs, clss, regrs) in enumerate(dataloader):
             imgs = imgs.to(device)
@@ -107,7 +107,7 @@ if __name__ == '__main__':
             epoch_loss_regr += loss_regr.item()
             epoch_loss += loss.item()
             mmp = batch_i+1
-    
+            scheduler.step(epoch)
             print(f'Ep:{epoch}/{epochs-1}--'
                   f'Batch:{batch_i}/{epoch_size}\n'
                   f'batch: loss_cls:{loss_cls.item():.4f}--loss_regr:{loss_regr.item():.4f}--loss:{loss.item():.4f}\n'

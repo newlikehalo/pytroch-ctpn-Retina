@@ -22,6 +22,7 @@ import math
 from lib.text_proposal_connector import TextProposalConnector
 import copy
 
+
 # from lib.fast_rcnn.nms_wrapper import nms
 def cutstr(string):
     return string.split('/')[-1].split('.')[0]
@@ -33,14 +34,14 @@ def ifdir(dir):  # 判断是不是有这个目录
 
 
 ALL_DIR = "/home/like/data/ctpnresult"
-EPOCH = "epoch_20"
+EPOCH = "epoch_2_3"
 
 EPOCH_DIR = os.path.join(ALL_DIR, EPOCH)
 
 newepoch = os.path.join(EPOCH_DIR, str(config.IOU_SELECT))
 ifdir(newepoch)
-EPOCH_IMAGE = os.path.join(newepoch, "imageresult")
-EPOCH_TXT = os.path.join(newepoch, "pthfile")
+EPOCH_IMAGE = os.path.join(newepoch, "imageresult_6")
+EPOCH_TXT = os.path.join(newepoch, "pthfile_6")
 
 ifdir(EPOCH_DIR)
 ifdir(EPOCH_IMAGE)
@@ -49,9 +50,12 @@ ifdir(EPOCH_TXT)
 prob_thresh = config.IOU_SELECT
 width = 600
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-weights = os.path.join(EPOCH_DIR, 'ctpn_ep20_0.1779_0.1985_0.3765.pth.tar')
+weights = glob.glob(os.path.join(EPOCH_DIR, '*.tar'))[0]
+# torch.save(weights,weights)
+ipdb.set_trace()
 # img_path = '/home/like/data/pic/image/without_label/37.JPG'
-
+# weights = "/home/like/pytorch_ctpn/checkpoints/ctpn_ep02_0.0727_0.0568_0.1295.pth.tar"
+ipdb.set_trace()
 model = CTPN_Model()
 model.load_state_dict(torch.load(weights, map_location=device)['model_state_dict'])
 model.to(device)
@@ -72,10 +76,10 @@ def anaiou(line, inds):
         bbox = line[i, :4]
         x1, y1, x2, y2 = bbox[0], bbox[1], bbox[2], bbox[3]
         boxs.append(bbox)
-    newbox=copy.deepcopy(boxs)
+    newbox = copy.deepcopy(boxs)
     for i, mbox in enumerate(boxs):
         for j, nbox in enumerate(boxs):
-            if i != j :
+            if i != j:
 
                 marea = (mbox[2] - mbox[0]) * (mbox[3] - mbox[1])
                 narea = (nbox[2] - nbox[0]) * (nbox[3] - nbox[1])
@@ -91,18 +95,18 @@ def anaiou(line, inds):
                     bx2 = max(mbox[2], nbox[2])
                     by1 = min(mbox[1], nbox[1])
                     by2 = max(mbox[3], nbox[3])
-                    newbox[i]=[0,0,0,0]
-                    newbox[j]=[bx1,by1,bx2,by2]
+                    newbox[i] = [0, 0, 0, 0]
+                    newbox[j] = [bx1, by1, bx2, by2]
                 elif intersection / narea > 0.7:
                     bx1 = min(mbox[0], nbox[0])
                     bx2 = max(mbox[2], nbox[2])
                     by1 = min(mbox[1], nbox[1])
                     by2 = max(mbox[3], nbox[3])
                     newbox[j] = [0, 0, 0, 0]
-                    newbox[i]=[bx1,by1,bx2,by2]
-    nnbox=[]
+                    newbox[i] = [bx1, by1, bx2, by2]
+    nnbox = []
     for i in newbox:
-        if not(i[0]==0 and i[1]==0 and i[2]==0 and i[3]==0):
+        if not (i[0] == 0 and i[1] == 0 and i[2] == 0 and i[3] == 0):
             # print(i)
             nnbox.append(i)
         else:
@@ -118,7 +122,7 @@ def save_results(image_name, line, thresh):
         return
     newimage_name = image_name.split('/')[-1].split('.')[0]
     all_list = []
-    nnbox=anaiou(line, inds)
+    nnbox = anaiou(line, inds)
     for bbox in nnbox:
         # bbox = line[i, :4]
         # score = line[i, -1]
@@ -186,7 +190,7 @@ def test(img_path):
 
 
 if __name__ == '__main__':
-    DATA_DIR = "/home/like/data/ctpnresult/testdata/pic"
+    DATA_DIR = "/home/like/data/ctpnresult/testdata/newimage_6"
     im_names = glob.glob(os.path.join(DATA_DIR, '*.png')) + \
                glob.glob(os.path.join(DATA_DIR, '*.jpg'))
     im_names.sort()

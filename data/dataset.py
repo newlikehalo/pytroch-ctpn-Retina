@@ -60,44 +60,26 @@ class VOCDataset(Dataset):
             raise Exception('[ERROR] {} is not a directory'.format(labelsdir))
 
         self.datadir = datadir
-        self.datadir2="/home/like/data/ctpn/VOCdevkit2007/VOC2007/JPEGImages2"
+        self.datadir2="/home/like/data/VOC/VOC2007/JPEGImages2"
         # self.img_names = os.listdir(self.datadir)
 
         self.labelsdir = labelsdir
         # 取出文件夹中的文件
         self.img_names = []
-        image_set_file = "/home/like/data/ctpn/VOCdevkit2007/VOC2007/ImageSets/Main/trainval.txt"
+        image_set_file = "/home/like/data/VOC/VOC2007/ImageSets/Main/trainval.txt"
         assert os.path.exists(image_set_file), \
             'Path does not exist: {}'.format(image_set_file)
         with open(image_set_file) as f:
-            self.img_names = [x.strip() + '.jpg' for x in f.readlines()]
+            self.img_names = [x.strip() + '.png' for x in f.readlines()]
 
         self.img_names2=[]
-        image_set_file2 = "/home/like/data/ctpn/VOCdevkit2007/VOC2007/ImageSets/Main/trainval2.txt"
+        image_set_file2 = "/home/like/data/VOC/VOC2007/ImageSets/Main/trainval2.txt"
         assert os.path.exists(image_set_file2), \
             'Path does not exist: {}'.format(image_set_file2)
         with open(image_set_file2) as f:
-            self.img_names2 = [x.strip() + '.png' for x in f.readlines()]
+            self.img_names2 = [x.strip() + '.jpg' for x in f.readlines()]
 
         self.img_name=self.img_names+self.img_names2
-
-        # ipdb.set_trace()
-        #
-        # #判断问价是否存在 new wrok
-        # for i,img_name in enumerate(self.img_name):
-        #     img_path=os.path.join(self.datadir, img_name)
-        #     if not os.path.exists(img_path):
-        #         img_path = os.path.join(self.datadir2, img_name)
-        #     xml_path=""
-        #     lim=img_name.split('_')[0]
-        #     if lim=="img":
-        #         xml_path = os.path.join(self.labelsdir, img_name.replace('.jpg', '.xml'))
-        #     else:
-        #         self.labelsdir2="home/like/data/ctpn/VOCdevkit2007/VOC2007/Annotations2"
-        #         xml_path = os.path.join(self.labelsdir2, img_name.replace('.png', '.xml'))
-        #     print(i,img_path,xml_path)
-        # ipdb.set_trace()
-
 
 
     def __len__(self):
@@ -111,11 +93,11 @@ class VOCDataset(Dataset):
             img_path = os.path.join(self.datadir2, img_name)
         xml_path = ""
         lim = img_name.split('_')[0]
-        if lim == "img":
-            xml_path = os.path.join(self.labelsdir, img_name.replace('.jpg', '.xml'))
+        if lim not in ["img","image","tainchi"]:
+            xml_path = os.path.join(self.labelsdir, img_name.replace('.png', '.xml'))
         else:
-            self.labelsdir2 = "/home/like/data/ctpn/VOCdevkit2007/VOC2007/Annotations2"
-            xml_path = os.path.join(self.labelsdir2, img_name.replace('.png', '.xml'))
+            self.labelsdir2 = "/home/like/data/VOC/VOC2007/Annotations2"
+            xml_path = os.path.join(self.labelsdir2, img_name.replace('.jpg', '.xml'))
         #new work end
         img = cv2.imread(img_path)
         height, width = img.shape[:2]

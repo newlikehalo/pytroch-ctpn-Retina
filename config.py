@@ -7,7 +7,7 @@
 import os
 
 # base_dir = 'path to dataset base dir'
-base_dir = '/home/like/data/ctpn/VOCdevkit2007'
+base_dir = '/home/like/data/VOC'
 img_dir = os.path.join(base_dir, 'VOC2007/JPEGImages')
 xml_dir = os.path.join(base_dir, 'VOC2007/Annotations')
 
@@ -27,5 +27,5 @@ RPN_TOTAL_NUM = 1000
 IMAGE_MEAN = [123.68, 116.779, 103.939]
 
 
-checkpoints_dir = './checkpoints'
+checkpoints_dir = '/home/data/checkpoints'
 outputs = r'./logs'

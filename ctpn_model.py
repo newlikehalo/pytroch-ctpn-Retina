@@ -110,6 +110,7 @@ class CTPN_Model(nn.Module):
         x = self.fpn(x)[1] #[1, 256, 66, 120]
         # rpn
         x = self.rpn(x)
+ 
         x1 = x.permute(0, 2, 3, 1).contiguous()  # channels last
         b = x1.size()  # batch_size, h, w, c
         x1 = x1.view(b[0] * b[1], b[2], b[3]) #torch.Size([66, 120, 256])
