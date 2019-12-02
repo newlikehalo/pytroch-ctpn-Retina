@@ -11,7 +11,7 @@ import numpy as np
 import cv2
 from torch.utils.data import Dataset
 import torch
-from config import IMAGE_MEAN
+from config import IMAGE_MEAN,IMAGE_MEAN_NEW
 from ctpn_utils import cal_rpn
 import ipdb
 import math
@@ -41,6 +41,16 @@ def readxml(path, height, width):
                     gtboxes.append((xmin, ymin, xmax, ymax))
 
     return np.array(gtboxes), imgfile
+
+def dealgray(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+    eroded = cv2.erode(gray, kernel)
+    # cv2.imwrite("1.png", eroded)
+    gray = cv2.medianBlur(eroded, 3)
+    # cv2.imwrite("2.png",gray)
+    return gray
 
 
 # for ctpn text detection
@@ -81,7 +91,6 @@ class VOCDataset(Dataset):
 
         self.img_name=self.img_names+self.img_names2
 
-
     def __len__(self):
         return len(self.img_name)
 
@@ -100,6 +109,11 @@ class VOCDataset(Dataset):
             xml_path = os.path.join(self.labelsdir2, img_name.replace('.jpg', '.xml'))
         #new work end
         img = cv2.imread(img_path)
+
+        gray = dealgray(img)
+        gray=gray-IMAGE_MEAN_NEW
+
+
         height, width = img.shape[:2]
         gtbox, _ = readxml(xml_path, height, width)  # guiyihuatuxian
         # img=cv2.resize(img,(1080,1920),interpolation=cv2.INTER_CUBIC)
@@ -122,8 +136,9 @@ class VOCDataset(Dataset):
 
         # transform to torch tensor
         m_img = torch.from_numpy(m_img.transpose([2, 0, 1])).float()
+        gray = torch.from_numpy(gray).float()
         cls = torch.from_numpy(cls).float()
         regr = torch.from_numpy(regr).float()
 
 
-        return m_img, cls, regr
+        return m_img, gray,cls, regr

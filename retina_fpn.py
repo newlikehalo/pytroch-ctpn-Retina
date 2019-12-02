@@ -113,7 +113,7 @@ class RetinaFPN(nn.Module):
         # Smooth
         p4 = self.smooth1(p4)
         p3 = self.smooth2(p3)
-        return p3, p4, p5, p6, p7
+        return p3, p4
 
 
 def RetinaFPN101():

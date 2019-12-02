@@ -38,10 +38,10 @@ def get_arguments():
 
 
 def save_checkpoint(state, epoch, loss_cls, loss_regr, loss, ext='pth.tar'):
+
     check_path = os.path.join(config.checkpoints_dir,
                               f'ctpn_ep{epoch:02d}_'
                               f'{loss_cls:.4f}_{loss_regr:.4f}_{loss:.4f}.{ext}')
-
     torch.save(state, check_path)
     print('saving to {}'.format(check_path))
 
@@ -88,14 +88,15 @@ if __name__ == '__main__':
         epoch_loss = 0
         
     
-        for batch_i, (imgs, clss, regrs) in enumerate(dataloader):
+        for batch_i, (imgs, gray,clss, regrs) in enumerate(dataloader):
             imgs = imgs.to(device)
+            gray = gray.to(device)
             clss = clss.to(device)
             regrs = regrs.to(device)
     
             optimizer.zero_grad()
     
-            out_cls, out_regr = model(imgs)  #torch.Size([1, 78000, 2])
+            out_cls, out_regr = model(imgs,gray)  #torch.Size([1, 78000, 2])
             loss_cls = critetion_cls(out_cls, clss) #torch.Size([1, 1, 78000])
             loss_regr = critetion_regr(out_regr, regrs) #torch.Size([1, 78000, 3])
     

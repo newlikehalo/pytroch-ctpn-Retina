@@ -34,14 +34,14 @@ def ifdir(dir):  # 判断是不是有这个目录
 
 
 ALL_DIR = "/home/like/data/ctpnresult"
-EPOCH = "epoch_2_3"
+EPOCH = "epoch_12_b"
 
 EPOCH_DIR = os.path.join(ALL_DIR, EPOCH)
 
 newepoch = os.path.join(EPOCH_DIR, str(config.IOU_SELECT))
 ifdir(newepoch)
-EPOCH_IMAGE = os.path.join(newepoch, "imageresult_6")
-EPOCH_TXT = os.path.join(newepoch, "pthfile_6")
+EPOCH_IMAGE = os.path.join(newepoch, "imageresult")
+EPOCH_TXT = os.path.join(newepoch, "pthfile")
 
 ifdir(EPOCH_DIR)
 ifdir(EPOCH_IMAGE)
@@ -148,6 +148,11 @@ def connect_proposal(text_proposals, scores, im_size):
 
 def test(img_path):
     image = cv2.imread(img_path)
+
+    """gray"""
+
+
+
     isize = image.shape
     # ipdb.set_trace()
     image_c = image.copy()
@@ -157,6 +162,9 @@ def test(img_path):
     h, w = image.shape[:2]
     image = image.astype(np.float32) - config.IMAGE_MEAN
     image = torch.from_numpy(image.transpose(2, 0, 1)).unsqueeze(0).float()
+
+
+
     with torch.no_grad():
         image = image.to(device)
         cls, regr = model(image)
@@ -190,7 +198,7 @@ def test(img_path):
 
 
 if __name__ == '__main__':
-    DATA_DIR = "/home/like/data/ctpnresult/testdata/newimage_6"
+    DATA_DIR = "/home/like/data/ctpnresult/testdata/pic"
     im_names = glob.glob(os.path.join(DATA_DIR, '*.png')) + \
                glob.glob(os.path.join(DATA_DIR, '*.jpg'))
     im_names.sort()

@@ -25,7 +25,7 @@ RPN_TOTAL_NUM = 1000
 
 # bgr can find from  here: https://github.com/fchollet/deep-learning-models/blob/master/imagenet_utils.py
 IMAGE_MEAN = [123.68, 116.779, 103.939]
+IMAGE_MEAN_NEW=[127.5]
 
-
-checkpoints_dir = '/home/data/checkpoints'
+checkpoints_dir = '/home/like/data/checkpoints'
 outputs = r'./logs'

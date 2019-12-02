@@ -95,9 +95,13 @@ class CTPN_Model(nn.Module):
     def __init__(self):
         super().__init__()
         base_model = models.vgg16(pretrained=True)
-        layers = list(base_model.features)[:-1]
+        layers = list(base_model.features)[0:17]
         self.base_layers = nn.Sequential(*layers)  # block5_conv3 output
+        self.base_layers[4].ceil_mode=True
+        self.base_layers[9].ceil_mode=True
+        self.base_layers[16].ceil_mode=True
         self.rpn = BasicConv(256, 256, 3,1,1,bn=False)
+        self.rpn_new = BasicConv(256, 256, 3, 2, 1, bn=False)
         self.brnn = nn.LSTM(256,128, bidirectional=True, batch_first=True)
         self.lstm_fc = BasicConv(256, 512,1,1,relu=True, bn=False)
         self.rpn_class = BasicConv(512, 10*2, 1, 1, relu=False,bn=False)
@@ -105,12 +109,18 @@ class CTPN_Model(nn.Module):
 
         self.fpn = RetinaFPN101()
 
-    def forward(self, x):
+    def forward(self, x,gray):
         #new work
-        x = self.fpn(x)[1] #[1, 256, 66, 120]
+        gray=torch.unsqueeze(gray,0)
+        gray=torch.cat((gray,gray,gray),1)
+        gray_x=self.base_layers(gray)
+        p3,x = self.fpn(x) #[1, 256, 66, 120]
         # rpn
+        gray_x=p3+gray_x
         x = self.rpn(x)
- 
+        all_x=self.rpn_new(gray_x)
+        x=x+all_x
+
         x1 = x.permute(0, 2, 3, 1).contiguous()  # channels last
         b = x1.size()  # batch_size, h, w, c
         x1 = x1.view(b[0] * b[1], b[2], b[3]) #torch.Size([66, 120, 256])
